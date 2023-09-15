@@ -314,12 +314,11 @@ const cars = [
 async function initCarsCollection() {
   try {
     await ORM.removeCollectionData( 'Cars');
-    await ORM.insertData('Users', cars);
+    await ORM.insertData('Cars', cars);
   }
   catch (err) {
     console.log("the DB is already empty")
   }
-  await ORM.insertData('Cars', cars)
 }
 
 
