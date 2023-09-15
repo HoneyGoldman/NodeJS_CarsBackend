@@ -6,18 +6,15 @@ Object.defineProperty(exports, "__esModule", { value: true });
 // Import required modules
 // const express = require('express');
 const express_1 = __importDefault(require("express"));
+const cars_router_1 = __importDefault(require("./Controllers/cars_router"));
+const users_router_1 = __importDefault(require("./Controllers/users_router"));
 const app = (0, express_1.default)();
-const bodyParser = require('body-parser');
 // Set up body parser middleware to parse JSON and URL-encoded data
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
-// Import cars router
-const cars_router = require('./Controllers/cars_router');
-const users_router = require('./Controllers/users_router');
+app.use(express_1.default.json());
 // Use the cars_router for URL that starts with 'Cars'
-app.use('/Cars', cars_router);
+app.use('/Cars', cars_router_1.default);
 // Use the user_router for URL that starts with 'User'
-app.use('/User', users_router);
+app.use('/User', users_router_1.default);
 // Define a default route
 app.get('/', (_req, res) => {
     res.send("I'm Alive!");

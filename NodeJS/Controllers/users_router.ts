@@ -1,8 +1,9 @@
 import express from 'express';
+import * as ORM from '../ORM/generic_mongo_dao';
 const router = express.Router();
 
 
-const users = [
+const users: Record<string, any>[] = [
   {
     "id": 1,
     "name": "John Doe",
@@ -612,12 +613,11 @@ const users = [
 //     // parse the obj string and convert it to an actual object
 //     obj = JSON.parse(obj);
 // }) 
-const ORM = require('../ORM/generic_mongo_dao');
 
 async function initUsersCollection() {
   try {
-    await ORM.removeCollectionData('CarsApp', 'Users');
-    await ORM.insertData('CarsApp', 'Users', users);
+    await ORM.removeCollectionData('Users');
+    await ORM.insertData('Users', users);
   }
   catch (err) {
     console.log("the DB is already empty")
@@ -639,7 +639,7 @@ router.get('/InitDB', async (_req: any, _res: any) => {
 //Get All users
 router.get('/All', async (_req: any, _res: any) => {
   try {
-    const users = await ORM.getAllCollection('CarsApp', 'Users');
+    const users = await ORM.getAllCollection('Users');
     _res.status(200).json(users);
   } catch (err) {
     console.log(err);
@@ -649,12 +649,12 @@ router.get('/All', async (_req: any, _res: any) => {
 
 router.get('/ID/:id', async (_req: any, _res: any) => {
   const id = _req.params.id;
-  _res.send(await ORM.getObjById('CarsApp', 'Users', id));
+  _res.send(await ORM.getObjById('Users', id));
 });
 
 router.delete('/ID/:id', async (_req: any, _res: any) => {
   const id = _req.params.id;
-  await ORM.deletObjById('CarsApp', 'Users', id)
+  await ORM.deleteObjById('Users', id)
   _res.send("Done- delete by ID:" + id);
 });
 
@@ -672,11 +672,11 @@ router.post('/Add', async (_req: any, _res: any) => {
     }
   })
   if (insert_command) {
-    ORM.insertOne('CarsApp', 'Users', user);
+    ORM.insertOne('Users', user);
   }
   else {
     return 'please check that all keys exist in user object! ' + Object.keys(dummy_user)
   }
 });
 
-module.exports = router;
+export default router;

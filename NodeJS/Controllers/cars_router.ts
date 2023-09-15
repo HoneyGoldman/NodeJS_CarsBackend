@@ -1,4 +1,5 @@
 import express from 'express';
+import * as ORM from '../ORM/generic_mongo_dao';
 const router = express.Router();
 
 
@@ -310,16 +311,15 @@ const cars = [
   }
 ]
 
-const car_dao = require('../ORM/generic_mongo_dao');
-
 async function initCarsCollection() {
   try {
-    await car_dao.removeCollectionData('CarsApp', 'Cars');
+    await ORM.removeCollectionData( 'Cars');
+    await ORM.insertData('Users', cars);
   }
   catch (err) {
     console.log("the DB is already empty")
   }
-  await car_dao.insertData('CarsApp', 'Cars', cars)
+  await ORM.insertData('Cars', cars)
 }
 
 
@@ -336,7 +336,7 @@ router.get('/InitDB', async (_req: any, _res: any) => {
 //Get All cars
 router.get('/All', async (_req: any, _res: any) => {
   try {
-    const cars = await car_dao.getAllCollection('CarsApp', 'Cars');
+    const cars = await ORM.getAllCollection('Cars');
     _res.status(200).json(cars);
   } catch (err) {
     console.log(err);
@@ -346,7 +346,7 @@ router.get('/All', async (_req: any, _res: any) => {
 
 //returns all cars by the following format company2Cars: Map<string, Car[]>
 router.get('/All/SearchFormat', async (_req: any, _res: any) => {
-  const cars: Car[] = await car_dao.getAllCollection('CarsApp', 'Cars');
+  const cars: Car[] = await ORM.getAllCollection('Cars');
   let result: Map<string, Car[]> = new Map<string, Car[]>();
   cars.forEach(car => {
     if (result.get(car.company) !== undefined && result.get(car.company) !== null) {
@@ -361,12 +361,12 @@ router.get('/All/SearchFormat', async (_req: any, _res: any) => {
 
 router.get('/ID/:id', async (_req: any, _res: any) => {
   const id = _req.params.id;
-  _res.send(await car_dao.getObjById('CarsApp', 'Cars', id));
+  _res.send(await ORM.getObjById('Cars', id));
 });
 
 router.delete('/ID/:id', async (_req: any, _res: any) => {
   const id = _req.params.id;
-  await car_dao.deletObjById('CarsApp', 'Cars', id)
+  await ORM.deleteObjById('Cars', id)
   _res.send("Done- delete by ID:" + id);
 });
 
@@ -386,11 +386,12 @@ router.post('/Add', async (_req: any, _res: any) => {
     }
   })
   if (insert_command) {
-    car_dao.insertOne('CarsApp', 'Cars', car);
+    ORM.insertOne('Cars', car);
   }
   else {
     return 'please check that all keys exist in car object! ' + Object.keys(dummy_car)
   }
 });
 
-module.exports = router;
+
+export default router;

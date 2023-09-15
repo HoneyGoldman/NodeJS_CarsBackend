@@ -1,16 +1,15 @@
 // Import required modules
 // const express = require('express');
 import express from 'express';
+import cars_router from './Controllers/cars_router';
+import users_router from './Controllers/users_router';
+
+
 const app = express();
-const bodyParser = require('body-parser');
-
 // Set up body parser middleware to parse JSON and URL-encoded data
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: false }));
+app.use(express.json());
 
-// Import cars router
-const cars_router = require('./Controllers/cars_router');
-const users_router = require('./Controllers/users_router');
+
 
 // Use the cars_router for URL that starts with 'Cars'
 app.use('/Cars', cars_router);

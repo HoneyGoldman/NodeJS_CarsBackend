@@ -1,10 +1,11 @@
 const { MongoClient, ObjectId } = require('mongodb');
 
 const uri = 'mongodb://127.0.0.1:27017';
+const db_name = "";
 
 async function connect() {
-    const client = new MongoClient(uri);
     try {
+        const client = new MongoClient(uri);
         await client.connect();
         console.log('Connected to MongoDB');
         return client;
@@ -14,7 +15,7 @@ async function connect() {
     }
 }
 
-async function insertData(db_name: string, collection: string, data: any) {
+async function insertData(collection: string, data: Record<string, any>[]) {
     const mongoClient = await connect();
     try {
         const db = await mongoClient.db(db_name);
@@ -30,7 +31,7 @@ async function insertData(db_name: string, collection: string, data: any) {
     }
 }
 
-async function removeCollectionData(db_name: string, collection: string) {
+async function removeCollectionData(collection: string) {
     const mongoClient = await connect();
     try {
         const db = await mongoClient.db(db_name);
@@ -49,7 +50,7 @@ async function removeCollectionData(db_name: string, collection: string) {
 }
 
 
-async function getAllCollection(db_name: string, collection: string) {
+async function getAllCollection(collection: string) {
     const mongoClient = await connect();
     try {
         const db = await mongoClient.db(db_name);
@@ -67,7 +68,7 @@ async function getAllCollection(db_name: string, collection: string) {
     }
 }
 
-async function getObjById(db_name: string, collection: string, id: any) {
+async function getObjById(collection: string, id: any) {
     try {
         const mongoClient = await connect();
         try {
@@ -88,7 +89,7 @@ async function getObjById(db_name: string, collection: string, id: any) {
     }
 }
 
-async function deletObjById(db_name: string, collection: string, id: any) {
+async function deleteObjById(collection: string, id: any) {
     try {
         const mongoClient = await connect();
         try {
@@ -108,18 +109,18 @@ async function deletObjById(db_name: string, collection: string, id: any) {
     }
 }
 
-async function insertOne(db_name: string, collection: string, data: any) {
-    await insertData(db_name, collection, [data]); //reusing insert list to insert one
+async function insertOne(collection: string, data: any) {
+    await insertData(collection, [data]); //reusing insert list to insert one
     return "Done"
 }
 
 
-module.exports = {
+export {
     connect,
     insertData,
     getAllCollection,
     getObjById,
-    deletObjById,
+    deleteObjById,
     insertOne,
     removeCollectionData
 }

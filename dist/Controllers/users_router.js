@@ -1,4 +1,27 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -13,6 +36,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = __importDefault(require("express"));
+const ORM = __importStar(require("../ORM/generic_mongo_dao"));
 const router = express_1.default.Router();
 const users = [
     {
@@ -623,61 +647,45 @@ const users = [
 //     // parse the obj string and convert it to an actual object
 //     obj = JSON.parse(obj);
 // }) 
-const ORM = require('../ORM/generic_mongo_dao');
 function initUsersCollection() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            yield ORM.removeCollectionData('CarsApp', 'Users');
+            yield ORM.removeCollectionData('Users');
+            yield ORM.insertData('Users', users);
         }
         catch (err) {
             console.log("the DB is already empty");
         }
-        yield ORM.insertData('CarsApp', 'Users', users);
     });
 }
-//init cars DB with list data
+//init users DB with list data
 router.get('/InitDB', (_req, _res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
         yield initUsersCollection();
-        _res.status(200);
+        _res.status(200).end();
     }
     catch (err) {
-        _res.status(500).json({ error: 'Could not init cars DB.' });
+        _res.status(500).json({ error: 'Could not init users DB.' }).end();
     }
 }));
-//Get All cars
+//Get All users
 router.get('/All', (_req, _res) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const cars = yield ORM.getAllCollection('CarsApp', 'Users');
-        _res.status(200).json(cars);
+        const users = yield ORM.getAllCollection('Users');
+        _res.status(200).json(users);
     }
     catch (err) {
         console.log(err);
         _res.status(500).json({ error: 'Could not fetch all cars.' });
     }
 }));
-//returns all cars by the following format company2Cars: Map<string, Car[]>
-router.get('/All/SearchFormat', (_req, _res) => __awaiter(void 0, void 0, void 0, function* () {
-    const cars = yield ORM.getAllCollection('CarsApp', 'Users');
-    let result = new Map();
-    cars.forEach(car => {
-        var _a;
-        if (result.get(car.company) !== undefined && result.get(car.company) !== null) {
-            (_a = result.get(car.company)) === null || _a === void 0 ? void 0 : _a.push(car);
-        }
-        else {
-            result.set(car.company, [car]);
-        }
-    });
-    _res.send(Object.fromEntries(result));
-}));
 router.get('/ID/:id', (_req, _res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = _req.params.id;
-    _res.send(yield ORM.getObjById('CarsApp', 'Users', id));
+    _res.send(yield ORM.getObjById('Users', id));
 }));
 router.delete('/ID/:id', (_req, _res) => __awaiter(void 0, void 0, void 0, function* () {
     const id = _req.params.id;
-    yield ORM.deletObjById('CarsApp', 'Users', id);
+    yield ORM.deleteObjById('Users', id);
     _res.send("Done- delete by ID:" + id);
 }));
 router.post('/Add', (_req, _res) => __awaiter(void 0, void 0, void 0, function* () {
@@ -694,11 +702,11 @@ router.post('/Add', (_req, _res) => __awaiter(void 0, void 0, void 0, function* 
         }
     });
     if (insert_command) {
-        ORM.insertOne('CarsApp', 'Users', user);
+        ORM.insertOne('Users', user);
     }
     else {
         return 'please check that all keys exist in user object! ' + Object.keys(dummy_user);
     }
 }));
-module.exports = router;
+exports.default = router;
 //# sourceMappingURL=users_router.js.map

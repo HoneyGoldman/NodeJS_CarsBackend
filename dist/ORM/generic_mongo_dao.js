@@ -1,3 +1,4 @@
+"use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -7,12 +8,15 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.removeCollectionData = exports.insertOne = exports.deleteObjById = exports.getObjById = exports.getAllCollection = exports.insertData = exports.connect = void 0;
 const { MongoClient, ObjectId } = require('mongodb');
 const uri = 'mongodb://127.0.0.1:27017';
+const db_name = "";
 function connect() {
     return __awaiter(this, void 0, void 0, function* () {
-        const client = new MongoClient(uri);
         try {
+            const client = new MongoClient(uri);
             yield client.connect();
             console.log('Connected to MongoDB');
             return client;
@@ -23,15 +27,17 @@ function connect() {
         }
     });
 }
-function insertData(db_name, collection, data) {
+exports.connect = connect;
+function insertData(collection, data) {
     return __awaiter(this, void 0, void 0, function* () {
         const mongoClient = yield connect();
         try {
-            const db = mongoClient.db(db_name);
-            const collection_instance = db.collection(collection);
+            const db = yield mongoClient.db(db_name);
+            const collection_instance = yield db.collection(collection);
             const dataToInsert = data;
             const result = yield collection_instance.insertMany(dataToInsert);
             console.log(`Inserted ${result.insertedCount} document into the collection: ` + collection);
+            return;
         }
         catch (err) {
             console.error('Error inserting data:', err);
@@ -41,13 +47,14 @@ function insertData(db_name, collection, data) {
         }
     });
 }
-function removeCollectionData(db_name, collection) {
+exports.insertData = insertData;
+function removeCollectionData(collection) {
     return __awaiter(this, void 0, void 0, function* () {
         const mongoClient = yield connect();
         try {
-            const db = mongoClient.db(db_name);
-            const collection_instance = db.collection(collection);
-            collection_instance.drop((dropErr) => {
+            const db = yield mongoClient.db(db_name);
+            const collection_instance = yield db.collection(collection);
+            yield collection_instance.drop((dropErr) => {
                 if (dropErr) {
                     console.error('Error removing collection:', dropErr);
                 }
@@ -61,12 +68,13 @@ function removeCollectionData(db_name, collection) {
         }
     });
 }
-function getAllCollection(db_name, collection) {
+exports.removeCollectionData = removeCollectionData;
+function getAllCollection(collection) {
     return __awaiter(this, void 0, void 0, function* () {
         const mongoClient = yield connect();
         try {
-            const db = mongoClient.db(db_name);
-            const collection_instance = db.collection(collection);
+            const db = yield mongoClient.db(db_name);
+            const collection_instance = yield db.collection(collection);
             const result = collection_instance.find({});
             let array = [];
             yield result.forEach((document) => __awaiter(this, void 0, void 0, function* () {
@@ -82,13 +90,14 @@ function getAllCollection(db_name, collection) {
         }
     });
 }
-function getObjById(db_name, collection, id) {
+exports.getAllCollection = getAllCollection;
+function getObjById(collection, id) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const mongoClient = yield connect();
             try {
-                const db = mongoClient.db(db_name);
-                const collection_instance = db.collection(collection);
+                const db = yield mongoClient.db(db_name);
+                const collection_instance = yield db.collection(collection);
                 let result = yield collection_instance.findOne({
                     _id: new ObjectId(id)
                 });
@@ -103,13 +112,14 @@ function getObjById(db_name, collection, id) {
         }
     });
 }
-function deletObjById(db_name, collection, id) {
+exports.getObjById = getObjById;
+function deleteObjById(collection, id) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
             const mongoClient = yield connect();
             try {
-                const db = mongoClient.db(db_name);
-                const collection_instance = db.collection(collection);
+                const db = yield mongoClient.db(db_name);
+                const collection_instance = yield db.collection(collection);
                 yield collection_instance.deleteOne({
                     _id: new ObjectId(id)
                 });
@@ -124,17 +134,12 @@ function deletObjById(db_name, collection, id) {
         }
     });
 }
-function insertOne(db_name, collection, data) {
-    insertData(db_name, collection, [data]); //reusing insert list to insert one
-    return "Done";
+exports.deleteObjById = deleteObjById;
+function insertOne(collection, data) {
+    return __awaiter(this, void 0, void 0, function* () {
+        yield insertData(collection, [data]); //reusing insert list to insert one
+        return "Done";
+    });
 }
-module.exports = {
-    connect,
-    insertData,
-    getAllCollection,
-    getObjById,
-    deletObjById,
-    insertOne,
-    removeCollectionData
-};
+exports.insertOne = insertOne;
 //# sourceMappingURL=generic_mongo_dao.js.map
